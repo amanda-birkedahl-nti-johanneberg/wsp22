@@ -1,0 +1,38 @@
+section#boende_sida
+    section#section1_bo
+        form
+            #Namnd
+                label[for="Namn"]
+                    | Namn:
+                br
+                input#Namn[type="text" name="Namn"]
+            #Antald
+                label[for="Antal"]
+                    | Antal:
+                br
+                input#Antal[type="number" name="Antal" min="1" max="15"]
+            #Datumd
+                label[for="Datum"]
+                    | Datum:
+                br
+                input#Datum[type="date" name="Datum"]
+            #Valj_rumd
+                label[for="Valj_rum"]
+                    | Välj rum:
+                br
+                select#Valj_rum[name="Valj_rum"]
+                    option[value="Annat"]
+                        | Annat
+                    option[value="Small"]
+                        | Small
+                    option[value="Medium"]
+                        | Medium
+                    option[value="Large"]
+                        | Large
+                    option[value="Svit"]
+                        | Svit
+            input#sok[type="submit" value="Sök"]
+    section#section2_bo
+        - boende.each do |rum|
+            == slim :"delar/rum", locals: {rum: rum }
+        

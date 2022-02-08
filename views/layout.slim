@@ -1,0 +1,68 @@
+doctype html
+html[lang="en"]
+  head
+    meta[charset="UTF-8"]
+    meta[name="viewport" content="width=device-width, initial-scale=1.0"]
+    title
+      | Hem
+    link[rel="stylesheet" href="/css/style.css"]
+    link[rel="stylesheet" href="/css/style2.css"]
+    link[href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"]
+  body
+    nav#nav.menu
+      #closeB.menu-button
+        i.material-icons
+          | clear
+      a.logoContainer[href="/"]
+        img[src="/img/nyhotelllogga.png" alt="Bild på snögubbe med skidor"]
+      section#menua
+        a[href="/"]
+          | Hem
+        a[href="/boende"]
+          | Boende
+        a[href="/restaurang"]
+          | Restaurang
+        a[href="/spa"]
+          | Spa
+        a[href="/after_ski"]
+          | After ski
+    header
+      #openB.menu-button
+        i.material-icons
+          | menu
+      a.logoContainer[href="/"]
+        img[src="/img/nyhotelllogga.png" alt="Bild på snögubbe med skidor"]
+      a[href="/"]
+        | Hem
+      a[href="/boende"]
+        | Boende
+      a[href="/restaurang"]
+        | Restaurang
+      a[href="/spa"]
+        | Spa
+      a[href="/after_ski"]
+        | After ski
+    main
+      == yield
+    footer
+        section#info_footer
+        article#kontakt
+            .text_footer
+                h3
+                | Kontakt
+                p
+                | Telefon: 518-555-0162
+                p
+                | Email: cchamco122y@noisemails.com
+            article#adress
+                .text_footer
+                    h3
+                    | Adress
+                    p
+                    | 4042 Clearview Drive
+                    p
+                    | Colorado, United States
+        article#footer_copy
+            p
+            | Copyright © Amanda Birkedahl 2021
+        script[src="/js/main.js"]

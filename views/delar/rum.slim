@@ -1,0 +1,11 @@
+article.rum
+    img[src=rum[:bild] alt="Bild på litet hotellrum"]
+    .rum_text
+        div
+            h3 = rum[:typ]
+            a.edit href="/boende/#{rum[:id]}/redigera" 
+                span class="material-icons" edit
+        p = rum[:beskrivning]
+        ul
+            - rum[:punkter].each do |punkt|
+                li = punkt
