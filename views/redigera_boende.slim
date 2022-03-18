@@ -10,42 +10,16 @@ section
             input#title type="text" value="#{rum[:typ]}"
             textarea#beskrivning rows="4" resizable="off" = rum[:beskrivning]
             ul.align-left#list
-                - rum[:punkter].each.with_index do |punkt, index|
-                    input value="#{rum[:punkter][index]}"
-            span.material-icon
+                span#add-list class="material-icons" add
+
             section.action
                 section
                     input#valj-farg type="color" value="#{rum[:bakgrund]}"
                     button#reset Återställ
-javascript: 
-    let picker = document.getElementById("valj-farg")
-    let imagePicker = document.getElementById("valj-bild")
-    let bild = document.getElementById("bild")
-    let imageField = document.getElementById("bild-value")
-    let editRoom = document.getElementById("edit-room")
-    let aterstall = document.getElementById("reset")
 
-    let huvuddel = document.getElementById("huvuddel")
+        div
+            input type="submit" value="spara"
+javascript:
+    const data = #{{rum.to_json}}
 
-    const uppdateraFarg = (e) => {
-        huvuddel.style.backgroundColor = e.currentTarget.value
-    }
-
-    imagePicker.onclick = () => {
-        const url = imageField.value
-        #{ rum[:bild] }
-
-    }
-
-    aterstall.onclick = (e) => {
-        e.preventDefault()
-        picker.value = "#{rum[:bakgrund]}"
-        huvuddel.style.backgroundColor = "#{rum[:bakgrund]}"
-    }
-
-    picker.oninput = uppdateraFarg;
-    editRoom.onsubmit = (e) => {
-        e.preventDefault()
-
-
-    }
+script src="/js/redigera-boende.js" 

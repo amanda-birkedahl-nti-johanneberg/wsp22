@@ -27,12 +27,20 @@ get "/boende/:id/redigera" do |id|
   slim :redigera_boende, locals: { rum: rum }
 end
 
+post "/boende/:id/redigera" do |id|
+  p [id, JSON.parse(request.body.read)]
+
+  redirect "/boende"
+end
+
 get "/restaurang" do
   slim :restaurang
 end
+
 get "/spa" do
   slim :spa
 end
+
 get "/after_ski" do
   slim :after_ski
 end

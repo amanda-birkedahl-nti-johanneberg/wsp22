@@ -248,7 +248,8 @@ footer {
 }
 
 #article2_resta {
-  grid-area: a2r;
+  display: flex;
+  flex-direction: column;
   background-color: #c1af8e;
   padding: 2em;
 }
@@ -416,13 +417,11 @@ footer {
 
 #section1_bo article {
   width: 100%;
-  margin-top: 1rem;
 }
 
 #section1_bo {
   display: flex;
   justify-content: center;
-  margin-top: 60px;
   padding: 2rem;
   background-color: #435966;
 }
@@ -550,9 +549,8 @@ footer {
     display: grid;
     grid-template-columns: 60% 40%;
     grid-template-areas:
-      "he he"
       "a1r a1r"
-      "a2r a3r"
+      "a2r a3r" 
       "fo fo";
   }
 

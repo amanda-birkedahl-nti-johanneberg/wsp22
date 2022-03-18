@@ -1,6 +1,7 @@
 #edit-room {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   width: 100%;
 }
 
@@ -52,6 +53,7 @@
 
 #list > * {
   display: list-item;
+  list-style: circle;
 }
 
 a.edit {
@@ -66,4 +68,14 @@ a.edit {
   position: absolute;
   top: 1rem;
   right: 1rem;
+}
+
+#add-list {
+  font-size: medium;
+  background-color: #fff;
+  display: inline;
+  color: black;
+  border: 1px black solid;
+  user-select: none;
+  cursor: pointer;
 }
