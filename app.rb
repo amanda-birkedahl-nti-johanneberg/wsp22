@@ -1,46 +1,50 @@
 # frozen_string_literal: true
 
-require "sinatra"
-require "sinatra/reloader" if development?
+require 'sinatra'
+require 'sinatra/reloader' if development?
+
+require_relative 'models'
+require_relative 'methods'
 
 configure :development do
   register Sinatra::Reloader
 end
 
-get "/" do
+# Förstasidan
+get '/' do
   slim :index
 end
 
-rumLista = [
-  { id: 0, typ: "Small", bild: "/img/small.jpg", alt: "Bild på litet hotellrum", beskrivning: "Lorem ipsum", bakgrund: "#c1af8e", punkter: ["Info 1", "Info 2"] },
-  { id: 1, typ: "Medium", bild: "/img/medium.jpg", alt: "Bild på mediumstort hotellrum", beskrivning: "Lorem ipsum", bakgrund: "#c1af8e", punkter: ["Info 1", "Info 2"] },
-  { id: 2, typ: "Large", bild: "/img/large.jpg", alt: "Bild på large hotellrum", beskrivning: "Lorem ipsum", bakgrund: "#c1af8e", punkter: ["Info 1", "Info 2"] },
-  { id: 3, typ: "Svit", bild: "/img/svit.jpg", alt: "Bild på svit", beskrivning: "Lorem ipsum", bakgrund: "#c1af8e", punkter: ["Info 1", "Info 2"] },
-]
+# Lista med boende
+get '/boende' do
+  @boende = get_rooms # Hämta alla boende från databas
 
-get "/boende" do
-  slim :boende, locals: { boende: rumLista }
+  slim :boende
 end
 
-get "/boende/:id/redigera" do |id|
-  rum = rumLista.find { |i| i[:id] == id.to_i }
-  slim :redigera_boende, locals: { rum: rum }
+get '/boende/:id/redigera' do |id|
+  rum = get_room(id)
+
+  # Omvanda 'rgb(rr,gg,bb)' till hex-kod för chrome gör allt till rbg >:(
+  @color_as_hex = rbg_to_hex(rum[:bakgrund])
+  slim :"boende/redigera", locals: { rum: rum }
 end
 
-post "/boende/:id/redigera" do |id|
-  p [id, JSON.parse(request.body.read)]
+post '/boende/:id/redigera' do |id|
+  nytt_rum = JSON.parse(request.body.read)
+  uppdatera_rum(id, nytt_rum)
 
-  redirect "/boende"
+  redirect '/boende'
 end
 
-get "/restaurang" do
+get '/restaurang' do
   slim :restaurang
 end
 
-get "/spa" do
+get '/spa' do
   slim :spa
 end
 
-get "/after_ski" do
+get '/after_ski' do
   slim :after_ski
 end

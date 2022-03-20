@@ -1,0 +1,33 @@
+form#redigera
+    section#edit-room
+        section#bilddel
+            img#bild[src=rum[:bild] alt="#{rum[:alt]}"]
+            section.action
+                section
+                    input#bild-value type="text" placeholder="https://www.url.com/img.png" value="#{rum[:bild]}"
+                    button#valj-bild Ändra
+        section#huvuddel.rum_text[style="background-color: #{{@color_as_hex}}"]
+            select#title type="text" name="typ" value="#{rum[:typ]}"
+                option value=0 Small
+                option value=1 Medium
+                option value=2 Large
+                option value=3 Svit
+
+            textarea#beskrivning name="beskrivning" rows="4" resizable="off" = rum[:beskrivning]
+            ul.align-left#list
+                span#add-list class="material-icons" add
+
+            section.action
+                section
+                    input#valj-farg type="color" value="#{{@color_as_hex}}"
+                    button#reset Återställ
+
+    section#spara-rum
+        input type="submit" value="spara"
+
+    p#resultat
+javascript:
+    const data = #{{rum.to_json}}
+    const bakgrund = "#{@color_as_hex}"
+
+script src="/js/redigera-boende.js" 

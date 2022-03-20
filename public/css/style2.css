@@ -79,3 +79,14 @@ a.edit {
   user-select: none;
   cursor: pointer;
 }
+
+#spara-rum {
+  display: flex;
+  margin: 40px;
+  justify-content: center;
+  align-items: center;
+}
+
+#spara-rum [type=submit] {
+  padding: 1rem 2rem;
+}

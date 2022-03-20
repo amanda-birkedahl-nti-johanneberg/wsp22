@@ -1,18 +1,7 @@
-const picker = document.getElementById("valj-farg");
-const imagePicker = document.getElementById("valj-bild");
-const bild = document.getElementById("bild");
-const imageField = document.getElementById("bild-value");
-const editRoom = document.getElementById("edit-room");
-const aterstall = document.getElementById("reset");
-const punktlista = document.getElementById("list");
-const nyPunkt = document.getElementById("add-list");
-
-const huvuddel = document.getElementById("huvuddel");
-
 const punktChangeHandler = (index) => (event) => {
   data.punkter[index] = event.currentTarget.value;
 };
-
+console.log(bakgrund);
 const skapaPunkt = (punkt, index) => {
   const element = document.createElement("div");
   const knapp = document.createElement("span");
@@ -28,39 +17,65 @@ const skapaPunkt = (punkt, index) => {
   return element;
 };
 
+/*
+ * Skapa punkterna som finns när sidan laddas
+ */
+const punktlista = document.getElementById("list");
 data.punkter.forEach((punkt, index) => {
   const p = skapaPunkt(punkt, index);
   punktlista.append(p);
 });
 
-nyPunkt.onclick = () => {
+/*
+ * Lyssna på när användaren skapar nya punkter
+ */
+document.getElementById("add-list").onclick = () => {
   const punkt = skapaPunkt("", data.punkter.length);
+  data.punkter.push("");
   punktlista.append(punkt);
 };
 
-const uppdateraFarg = (e) => {
+/*
+ * Hantera färg
+ */
+const huvuddel = document.getElementById("huvuddel");
+document.getElementById("valj-farg").oninput = (e) => {
   huvuddel.style.backgroundColor = e.currentTarget.value;
 };
 
-imagePicker.onclick = () => {
-  const url = imageField.value;
-  console.log(url);
-  bild.src = url;
+document.getElementById("reset").onclick = (e) => {
+  e.preventDefault();
+  document.getElementById("valj-farg").value = bakgrund;
+  huvuddel.style.backgroundColor = bakgrund;
 };
 
-aterstall.onclick = (e) => {
-  e.preventDefault();
-  picker.value = "#{rum[:bakgrund]}";
-  huvuddel.style.backgroundColor = "#{rum[:bakgrund]}";
+/*
+ * Hantera bilden
+ */
+document.getElementById("valj-bild").onclick = () => {
+  const url = document.getElementById("bild-value").value;
+  document.getElementById("bild").src = url;
 };
 
-picker.oninput = uppdateraFarg;
-editRoom.onsubmit = (e) => {
+const resultat = document.getElementById("resultat");
+resultat.innerText = JSON.stringify(data);
+
+/*
+ * skicka iväg datan
+ */
+document.getElementById("redigera").onsubmit = async (e) => {
   e.preventDefault();
-  console.log(data);
-  fetch(`/boende/${data.id}/redigera`, {
+
+  data.bakgrund = huvuddel.style.backgroundColor;
+  data.beskrivning = document.getElementById("beskrivning").value;
+
+  const res = await fetch(`/boende/${data.id}/redigera`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
   });
+
+  if (res.redirected) {
+    window.location.href = res.url;
+  }
 };

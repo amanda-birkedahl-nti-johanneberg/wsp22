@@ -33,6 +33,5 @@ section#boende_sida
                         | Svit
             input#sok[type="submit" value="Sök"]
     section#section2_bo
-        - boende.each do |rum|
-            == slim :"delar/rum", locals: {rum: rum }
-        
+        - @boende.each do |rum|
+            == slim :"delar/rum", locals: { rum: rum }
