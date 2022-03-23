@@ -19,7 +19,7 @@ end
 get '/boende' do
   @boende = get_rooms # Hämta alla boende från databas
 
-  slim :boende
+  slim :"boende/index"
 end
 
 get '/boende/:id/redigera' do |id|
@@ -38,13 +38,13 @@ post '/boende/:id/redigera' do |id|
 end
 
 get '/restaurang' do
-  slim :restaurang
+  slim :"statiska/restaurang"
 end
 
 get '/spa' do
-  slim :spa
+  slim :"statiska/spa"
 end
 
 get '/after_ski' do
-  slim :after_ski
+  slim :"statiska/after_ski"
 end
