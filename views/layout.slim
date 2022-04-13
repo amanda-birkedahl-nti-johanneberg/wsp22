@@ -26,6 +26,10 @@ html[lang="en"]
           | Spa
         a[href="/after_ski"]
           | After ski
+        - if !session[:user].nil?
+          a href="/konto" = "Inloggad"
+        - else
+          a href="/konto" Logga in
     header
       #openB.menu-button
         i.material-icons
@@ -42,6 +46,10 @@ html[lang="en"]
         | Spa
       a[href="/after_ski"]
         | After ski
+      - if session[:user]
+          a href="/konto" = "Inloggad"
+      - else
+          a href="/konto" Logga in
     main
       == yield
     footer

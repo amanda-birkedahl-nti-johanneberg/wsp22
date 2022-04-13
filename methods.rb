@@ -19,3 +19,16 @@ def room_type(typ)
     'Okänd'
   end
 end
+
+def boknings_status(kod)
+  case kod
+  when 0
+    'Bokad'
+  when 1
+    'Pågående'
+  when 2
+    'Slutfört'
+  when 3
+    'Avbruten'
+  end
+end

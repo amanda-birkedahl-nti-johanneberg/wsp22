@@ -1,0 +1,20 @@
+section class="container-md"
+    h1 Admin
+    nav.links
+        a.link href="/admin" Alla
+        a.link href="/admin?status=0" Bokade 
+        a.link href="/admin?status=1" Pågående 
+        a.link href="/admin?status=3" Avbruta 
+        a.link href="/admin?status=2" Slutförda
+    - @bokningar.each do |bokning|
+            article
+                h3 #{boknings_status(bokning[:status])}: #{room_type(bokning[:typ])} i #{bokning[:antal_nights]} nätter
+                p Antal rum: #{bokning[:antal_rum]}
+                p Total pris per natt: #{bokning[:ppn] * bokning[:antal_rum]} kr
+                - if bokning[:status] == 0
+                    form action="/bokning/#{bokning[:bokning_id]}/avbryt" method="post" 
+                        input type="submit" value="Avbryt bokning"
+                - if bokning[:status] == 2
+                    form action="/bokning/#{bokning[:bokning_id]}/betyg" method="post"
+                        input type="text"/ 
+                        input type="submit" value="Lämna betyg"/

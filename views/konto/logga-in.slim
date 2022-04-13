@@ -1,0 +1,19 @@
+
+section class="container-md" 
+    h1 logga in eller skapa konto
+
+    section class="flex-row"
+        form action="/konto/skapa" method="post" class="form"
+            p Skapa konto
+            label for="ny_namn" Användarnamn
+            input type="text" name="namn" id="ny_namn"/
+            label for="ny_pass" Lösenord
+            input type="password" name="pass" id="ny_pass" /
+            input type="submit" value="Skapa konto"/
+        form action="/konto" method="post" class="form"
+            p Logga in
+            label for="namn" Användarnamn
+            input type="text" id="namn" name="namn"/
+            label for="pass" Lösenord
+            input type="password" id="pass" name="pass"
+            input type="submit" value="Logga in"/

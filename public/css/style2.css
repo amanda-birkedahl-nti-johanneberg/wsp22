@@ -90,3 +90,43 @@ a.edit {
 #spara-rum [type=submit] {
   padding: 1rem 2rem;
 }
+
+.container-md {
+  max-width: 1170px;
+  margin: auto;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+.form {
+  padding: 2rem;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  border-radius:0.2rem;
+  display: flex;
+  flex-direction: column;
+  max-width: 20em;
+}
+
+.book-form {
+  margin-top: 2em;
+  flex: 1;
+  align-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.link {
+  color: black;
+}
+
+.links {
+  display: flex;
+  gap: 8px;
+}

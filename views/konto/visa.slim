@@ -1,0 +1,28 @@
+section class="container-md"
+    - if is_me
+        h1 Hej <span style="font-weight: normal;">#{@user[:namn]}</span>
+    - else 
+        h1 Visar <span style="font-weight: normal;">#{@user[:namn]}</span>
+    - if @user[:id] == session[:user][:id]
+        - if is_me
+            <a href="/admin" class="link">Visa adminpanel</a>
+
+        form action="/konto/signout" method="post"
+            input type="submit" value="Logga ut"
+    section
+        - if is_me
+            h2 Mina bokningar
+        - else 
+            h2 #{@user[:namn]}s bokningar
+        - @bokningar.each do |bokning|
+            article
+                h3 #{boknings_status(bokning[:status])}: #{room_type(bokning[:typ])} i #{bokning[:antal_nights]} nätter
+                p Antal rum: #{bokning[:antal_rum]}
+                p Total pris per natt: #{bokning[:ppn] * bokning[:antal_rum]} kr
+                - if bokning[:status] == 0
+                    form action="/bokning/#{bokning[:bokning_id]}/avbryt" method="post" 
+                        input type="submit" value="Avbryt bokning"
+                - if bokning[:status] == 2
+                    form action="/bokning/#{bokning[:bokning_id]}/betyg" method="post"
+                        input type="text"/ 
+                        input type="submit" value="Lämna betyg"/
