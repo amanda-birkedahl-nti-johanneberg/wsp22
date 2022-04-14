@@ -10,3 +10,5 @@ gem "extralite"
 gem "sinatra"
 gem "sinatra-contrib"
 gem "slim"
+gem 'yard'
+gem 'yard-sinatra', git: 'https://github.com/chrisb/yard-sinatra'

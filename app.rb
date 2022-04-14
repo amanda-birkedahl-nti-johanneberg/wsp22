@@ -5,7 +5,7 @@ require 'sinatra/reloader' if development?
 require 'bcrypt'
 
 require_relative 'models'
-require_relative 'methods'
+require_relative 'utils'
 
 configure :development do
   register Sinatra::Reloader
@@ -13,55 +13,82 @@ end
 
 enable :sessions
 
-# Förstasidan
+include Models
+include Utils
+
+# Visar förstasidan
+#
 get '/' do
   slim :"statiska/index"
 end
 
-# Lista med boende
+# Visar en lista av boende och låter användaren boka rum
+#
+# @see Models#get_rooms
 get '/boende' do
   @boende = get_rooms # Hämta alla boende från databas
 
   slim :"boende/index"
 end
 
+# Visar sidan för att redigera rum
+#
+# @param [String] :id, rummets id
 get '/boende/:id/redigera' do |id|
   rum = get_room(id)
 
-  # Omvanda 'rgb(rr,gg,bb)' till hex-kod för chrome gör allt till rbg >:(
+  # Omvandla 'rgb(rr,gg,bb)' till hex-kod för chrome gör all hex till rbg >:(
   @color_as_hex = rbg_to_hex(rum[:bakgrund])
   slim :"boende/redigera", locals: { rum: rum }
 end
 
+# Uppdaterar ett rum och omdirigerar till '/boende'
+#
+# @param [String] body, ett rum omvandlat till json
+# @param [String] :id, rummets id
+#
+# @see Model#create_article
 post '/boende/:id/redigera' do |id|
   nytt_rum = JSON.parse(request.body.read)
-  uppdatera_rum(id, nytt_rum)
+  uppdatera_rum(id.to_i, nytt_rum)
 
   redirect '/boende'
 end
 
+# Bokar ett rum om användaren är inloggad
+#
+# @param [String] :id, rummets id
+# @param [Integer] gaster, antalet gäster
+# @param [Integer] nights, antalet nätter
+# @param [Integer] rooms, antalet rum
 post '/boende/:id/boka' do |id|
-  redirect '/konto' if session[:user].nil?
+  redirect '/konto' unless auth?
 
-  p [id, session[:user], params]
-
-  boka_rum(id, session[:user][:id], params)
+  boka_rum(id.to_i, session[:user][:id], params)
 
   redirect '/konto'
 end
 
+# Visar restaurangsidan
+#
 get '/restaurang' do
   slim :"statiska/restaurang"
 end
 
+# Visar spasidan
+#
 get '/spa' do
   slim :"statiska/spa"
 end
 
+# Visar after-ski sidan
+#
 get '/after_ski' do
   slim :"statiska/after_ski"
 end
 
+# Visar användarens konto om den är inloggad, annars visa inloggningssidan
+#
 get '/konto' do
   return slim :"konto/logga-in" if session[:user].nil?
 
@@ -73,19 +100,24 @@ end
 before '/konto/:id' do
   redirect '/konto' unless admin?(session[:user])
 end
+
+# Visa en annan användares konto, om admin är inloggad
+#
 get '/konto/:id' do |id|
   @user = get_user(id.to_i)
   @bokningar = get_bookings(id.to_i)
   slim :"konto/visa", locals: { is_me: id.to_i == session[:user][:id] }
 end
 
+# Loggar in om lösenord och användarman stämmer
+#
+# @param [String] pass, lösenord
+# @param [String] namn, användarnamn
 post '/konto' do
   # TODO: verifiera kredentialer
   password = params[:pass]
   namn = params[:namn]
   hash = get_user_hash(namn)
-
-  p [params]
 
   matchar = BCrypt::Password.new(hash) == password
   logga_in(namn) if matchar
@@ -93,6 +125,10 @@ post '/konto' do
   redirect '/konto'
 end
 
+# Skapar konto och loggar in om användaren skapas
+#
+# @param [String] pass, lösenord
+# @param [String] namn, användarnamn
 post '/konto/skapa' do
   # TODO: verifiera kredentialer
   password = params[:pass]
@@ -105,11 +141,14 @@ post '/konto/skapa' do
   redirect '/konto'
 end
 
+# Loggar ut
 post '/konto/signout' do
   session&.destroy
   redirect '/'
 end
 
+# Ändrar status på en bokning till 'Avbruten', om användaren kan avbryta
+#
 post '/bokning/:id/avbryt' do |id|
   redirect '/konto' unless user_can_cancel(id.to_i, session[:user][:id])
 
@@ -117,6 +156,8 @@ post '/bokning/:id/avbryt' do |id|
   redirect('/konto')
 end
 
+# Låter en admin slutflöra en bokning om den är klar
+#
 post '/bokning/:id/slutfor' do |id|
   redirect '/konto' unless auth?
   redirect '/konto' unless admin?(session[:user])
@@ -125,11 +166,15 @@ post '/bokning/:id/slutfor' do |id|
   redirect('/admin')
 end
 
+# Publicerar ett betyg om användaren har bott klart
+#
+# @param [String] :id, bokningens id
+# @param [String] text, betygets kommentar
+# @param [Integer] betyg, betyget
 post '/bokning/:id/betyg' do |id|
   bokning_id = id.to_i
 
   redirect '/konto' unless auth?
-  p [bokning_id, session]
   redirect '/konto' unless user_can_rate(bokning_id, session[:user])
 
   text = params[:text]
@@ -139,8 +184,9 @@ post '/bokning/:id/betyg' do |id|
   redirect '/konto'
 end
 
+# Visar adminsidan om admin är inloggad
 get '/admin' do
-  redirect '/konto' unless session[:user] && session[:user][:admin] == 1
+  redirect '/konto' unless auth? && admin?
 
   status = params[:status].nil? ? nil : params[:status].to_i
 
