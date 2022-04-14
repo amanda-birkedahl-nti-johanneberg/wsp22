@@ -1,28 +1,56 @@
 section class="container-md"
-    - if is_me
-        h1 Hej <span style="font-weight: normal;">#{@user[:namn]}</span>
-    - else 
-        h1 Visar <span style="font-weight: normal;">#{@user[:namn]}</span>
-    - if @user[:id] == session[:user][:id]
+    section class="flex gap-4"
         - if is_me
-            <a href="/admin" class="link">Visa adminpanel</a>
-
-        form action="/konto/signout" method="post"
-            input type="submit" value="Logga ut"
-    section
-        - if is_me
-            h2 Mina bokningar
+            h1 class="font-normal text-2xl mb-4" Hej <span class="font-bold">#{@user[:namn]}</span>
         - else 
-            h2 #{@user[:namn]}s bokningar
+            h1 class="font-normal text-2xl mb-4" Visar <span class="font-bold">#{@user[:namn]}</span>
+        - if is_me
+            form action="/konto/signout" method="post" class=""
+                input type="submit" value="Logga ut" class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" 
+
+    - if is_me && admin?(session[:user])
+        <a href="/admin" class="text-blue-400 font-semibold underline inline-block">Gå till adminpanel</a>
+
+    section class="my-4"
+        - if is_me
+            h2 class="text-2xl font-bold" Mina bokningar
+        - else 
+            h2 class="text-2xl font-bold" #{@user[:namn]}s bokningar
         - @bokningar.each do |bokning|
-            article
-                h3 #{boknings_status(bokning[:status])}: #{room_type(bokning[:typ])} i #{bokning[:antal_nights]} nätter
-                p Antal rum: #{bokning[:antal_rum]}
-                p Total pris per natt: #{bokning[:ppn] * bokning[:antal_rum]} kr
-                - if bokning[:status] == 0
-                    form action="/bokning/#{bokning[:bokning_id]}/avbryt" method="post" 
-                        input type="submit" value="Avbryt bokning"
-                - if bokning[:status] == 2
-                    form action="/bokning/#{bokning[:bokning_id]}/betyg" method="post"
-                        input type="text"/ 
-                        input type="submit" value="Lämna betyg"/
+            article class="shadow-md p-4 rounded-md flex gap-8"
+                img src="#{bokning[:rum_bild]}" alt="Bild på rumtypen" class="max-w-[20%]"
+                section class="flex flex-col mr-8"
+                    h2 class="text-xl mb-2" Detaljer
+                    h3 <span class="font-bold">#{boknings_status(bokning[:status])}</span>: #{room_type(bokning[:typ])} i #{bokning[:antal_nights]} nätter
+                    p Antal rum: #{bokning[:antal_rum]}
+                    p Total pris per natt: #{bokning[:ppn] * bokning[:antal_rum]} kr
+                section class="flex flex-col"
+                    - if bokning[:status] == 0
+                        h2 class="text-xl mb-2" Åtgärder
+                        form action="/bokning/#{bokning[:bokning_id]}/avbryt" method="post" 
+                            input type="submit" value="Avbryt bokning" class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
+                    - if bokning[:status] == 2
+                        h2 class="text-xl mb-2" Omdöme
+                        form action="/bokning/#{bokning[:bokning_id]}/betyg" method="post" class="flex flex-col items-start gap-2"
+                            textarea name="text" class="mb-2 appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" 
+                            div class="stars flex-shrink" style="--s:25px"
+                                input type="radio" name="rating" value="1" 
+                                input type="radio" name="rating" value="2" 
+                                input type="radio" name="rating" value="3" 
+                                input type="radio" name="rating" value="4" 
+                                input type="radio" name="rating" value="5" 
+                                i
+                            input type="submit" value="Lämna betyg" class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
+                    - if bokning[:status] == 4
+                        - betyg = get_rating(bokning[:bokning_id])
+                        h2 class="text-xl mb-2" Omdöme
+                        section
+                            p #{betyg[:text]}
+                            div class="stars flex-shrink" style="--s:25px"  value="#{betyg[:betyg]}"
+                                input type="radio"  value="1" disabled=true
+                                input type="radio"  value="2" disabled=true
+                                input type="radio"  value="3" disabled=true
+                                input type="radio"  value="4" disabled=true
+                                input type="radio"  value="5" disabled=true
+                                i
+                            p = betyg[:betyg]

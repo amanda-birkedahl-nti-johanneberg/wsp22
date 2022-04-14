@@ -30,5 +30,7 @@ def boknings_status(kod)
     'Slutfört'
   when 3
     'Avbruten'
+  when 4
+    'Slutfört'
   end
 end

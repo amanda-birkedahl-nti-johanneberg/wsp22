@@ -1,19 +1,29 @@
 
 section class="container-md" 
-    h1 logga in eller skapa konto
-
     section class="flex-row"
         form action="/konto/skapa" method="post" class="form"
-            p Skapa konto
-            label for="ny_namn" Användarnamn
-            input type="text" name="namn" id="ny_namn"/
-            label for="ny_pass" Lösenord
-            input type="password" name="pass" id="ny_pass" /
-            input type="submit" value="Skapa konto"/
+            h2 class="mb-4 text-lg" Skapa konto
+
+            div class="w-full mb-6"
+                label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="ny_namn"
+                    | Användarnamn
+                input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" name="ny_namn" id="ny_namn" type="text"
+            
+            div class="w-full mb-6"
+                label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="ny_pass"
+                    | Lösenord
+                input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" name="ny_pass" id="ny_pass" type="password"
+            
+            input type="submit" class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" value="Skapa konto"/
         form action="/konto" method="post" class="form"
-            p Logga in
-            label for="namn" Användarnamn
-            input type="text" id="namn" name="namn"/
-            label for="pass" Lösenord
-            input type="password" id="pass" name="pass"
-            input type="submit" value="Logga in"/
+            h2 class="mb-4 text-lg" Logga in
+            div class="w-full mb-6"
+                label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="namn"
+                    | Användarnamn
+                input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" name="namn" id="namn" type="text"
+
+            div class="w-full mb-6"
+                label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="pass"
+                    | Lösenord
+                input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" name="pass" id="pass" type="password"
+            input type="submit" class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" value="Logga in"/

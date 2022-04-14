@@ -1,11 +1,10 @@
 let button = document.querySelector("#openB");
-button.addEventListener("click",showMenu)
+button.addEventListener("click", showMenu);
 
 let closeB = document.querySelector("#closeB");
-closeB.addEventListener("click",showMenu)
+closeB.addEventListener("click", showMenu);
 
-function showMenu(){
-    let menu = document.querySelector("nav.menu")
-    menu.classList.toggle("show")
+function showMenu() {
+  let menu = document.querySelector("#meny");
+  menu.classList.toggle("show");
 }
-

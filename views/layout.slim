@@ -7,50 +7,12 @@ html[lang="en"]
       | Hem
     link[rel="stylesheet" href="/css/style.css"]
     link[rel="stylesheet" href="/css/style2.css"]
+    link[rel="stylesheet" href="/css/tailwind-dist.css"]
     link[href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"]
-  body
-    nav#nav.menu
-      #closeB.menu-button
-        i.material-icons
-          | clear
-      a.logoContainer[href="/"]
-        img[src="/img/nyhotelllogga.png" alt="Bild på snögubbe med skidor"]
-      section#menua
-        a[href="/"]
-          | Hem
-        a[href="/boende"]
-          | Boende
-        a[href="/restaurang"]
-          | Restaurang
-        a[href="/spa"]
-          | Spa
-        a[href="/after_ski"]
-          | After ski
-        - if !session[:user].nil?
-          a href="/konto" = "Inloggad"
-        - else
-          a href="/konto" Logga in
-    header
-      #openB.menu-button
-        i.material-icons
-          | menu
-      a.logoContainer[href="/"]
-        img[src="/img/nyhotelllogga.png" alt="Bild på snögubbe med skidor"]
-      a[href="/"]
-        | Hem
-      a[href="/boende"]
-        | Boende
-      a[href="/restaurang"]
-        | Restaurang
-      a[href="/spa"]
-        | Spa
-      a[href="/after_ski"]
-        | After ski
-      - if session[:user]
-          a href="/konto" = "Inloggad"
-      - else
-          a href="/konto" Logga in
-    main
+  body class="bg-primary-dark"
+    == slim :"delar/header"
+    
+    main class="bg-white py-4"
       == yield
     footer
         section#info_footer

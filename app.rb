@@ -85,6 +85,8 @@ post '/konto' do
   namn = params[:namn]
   hash = get_user_hash(namn)
 
+  p [params]
+
   matchar = BCrypt::Password.new(hash) == password
   logga_in(namn) if matchar
 
@@ -109,10 +111,32 @@ post '/konto/signout' do
 end
 
 post '/bokning/:id/avbryt' do |id|
-  return unless user_can_cancel(id.to_i, session[:user][:id])
+  redirect '/konto' unless user_can_cancel(id.to_i, session[:user][:id])
 
   cancel_booking(id.to_i)
   redirect('/konto')
+end
+
+post '/bokning/:id/slutfor' do |id|
+  redirect '/konto' unless auth?
+  redirect '/konto' unless admin?(session[:user])
+
+  slutfor_booking(id.to_i)
+  redirect('/admin')
+end
+
+post '/bokning/:id/betyg' do |id|
+  bokning_id = id.to_i
+
+  redirect '/konto' unless auth?
+  p [bokning_id, session]
+  redirect '/konto' unless user_can_rate(bokning_id, session[:user])
+
+  text = params[:text]
+  betyg = params[:rating].to_i
+  user_id = session[:user][:id]
+  rate_room(bokning_id, user_id, text, betyg)
+  redirect '/konto'
 end
 
 get '/admin' do

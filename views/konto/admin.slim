@@ -1,20 +1,23 @@
 section class="container-md"
-    h1 Admin
+    h1 class="mb-4 text-2xl font-bold" Admin
     nav.links
         a.link href="/admin" Alla
         a.link href="/admin?status=0" Bokade 
         a.link href="/admin?status=1" Pågående 
         a.link href="/admin?status=3" Avbruta 
         a.link href="/admin?status=2" Slutförda
-    - @bokningar.each do |bokning|
-            article
-                h3 #{boknings_status(bokning[:status])}: #{room_type(bokning[:typ])} i #{bokning[:antal_nights]} nätter
-                p Antal rum: #{bokning[:antal_rum]}
-                p Total pris per natt: #{bokning[:ppn] * bokning[:antal_rum]} kr
-                - if bokning[:status] == 0
-                    form action="/bokning/#{bokning[:bokning_id]}/avbryt" method="post" 
-                        input type="submit" value="Avbryt bokning"
-                - if bokning[:status] == 2
-                    form action="/bokning/#{bokning[:bokning_id]}/betyg" method="post"
-                        input type="text"/ 
-                        input type="submit" value="Lämna betyg"/
+    section class="flex flex-col gap-4"
+        - @bokningar.each do |bokning|
+            article class="shadow-md p-2 rounded-md flex  gap-8"
+                section class="flex flex-col"
+                    h3 <span class="font-bold">#{boknings_status(bokning[:status])}</span>: #{room_type(bokning[:typ])} i #{bokning[:antal_nights]} nätter
+                    p Antal rum: #{bokning[:antal_rum]}
+                    p Total pris per natt: #{bokning[:ppn] * bokning[:antal_rum]} kr
+                    - if bokning[:status] == 0
+                        section class="flex gap-4"
+                            form action="/bokning/#{bokning[:bokning_id]}/avbryt" method="post" 
+                                input type="submit" value="Avbryt bokning" class="flex-shrink-0 bg-red-500 hover:bg-red-700 border-red-500 hover:border-red-700 text-sm border-4 text-white py-1 px-2 rounded"
+                            form action="/bokning/#{bokning[:bokning_id]}/slutfor" method="post" 
+                                input type="submit" value="Slutför bokning" class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
+                section class="flex flex-col"
+                    h3 Bokat av <a class="text-blue-400 underline font-semibold" href="/konto/#{bokning[:user_id]}">#{bokning[:user_namn]}</a>

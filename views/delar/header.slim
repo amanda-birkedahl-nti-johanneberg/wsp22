@@ -1,0 +1,37 @@
+header class="bg-primary-dark "
+    section id="meny" class="grid grid-cols-[70px_1fr] grid-rows-[100px_1fr] transition-all max-h-[100px] px-4 justify-between items-center max-w-screen-md m-auto"
+        a href="/" class="max-h-[80px] max-w-[50px]"
+            img src="/img/nyhotelllogga.png" class="flex-1"
+    
+        i.material-icons class="lg:hidden text-white text-2xl justify-self-end" id="openB"
+            | menu
+        ul class="lg:hidden justify-evenly text-white gap-4 items-center flex flex-col row-start-2 row-end-3 col-span-2 col-start-1  "
+            li class="p-4"
+                a href="/" Hem 
+            li class="p-4"
+                a href="/boende" Boende 
+            li class="p-4"
+                a href="/restaurang" Restaurang 
+            li class="p-4"
+                a href="/spa" Spa 
+            li class="p-4"
+                - if session[:user]
+                    a href="/konto" = session[:user][:namn]
+                - else
+                    a href="/konto" Logga in
+
+
+        ul class="hidden lg:flex justify-evenly flex-1 text-white col-start-2 row-start-1"
+            li
+                a href="/" Hem 
+            li
+                a href="/boende" Boende 
+            li
+                a href="/restaurang" Restaurang 
+            li
+                a href="/spa" Spa 
+            li
+                - if session[:user]
+                    a href="/konto" = session[:user][:namn]
+                - else
+                    a href="/konto" Logga in

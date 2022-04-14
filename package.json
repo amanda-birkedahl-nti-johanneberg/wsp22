@@ -1,0 +1,14 @@
+{
+  "name": "wsp22",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/amanda-birkedahl-nti-johanneberg/wsp22.git",
+  "author": "amanda <amanda.birkedahl@elev.ga.ntig.se>",
+  "license": "MIT",
+  "scripts": {
+    "start": "tailwindcss -i ./public/css/tailwind.css -o ./public/css/tailwind-dist.css --watch"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.0.23"
+  }
+}

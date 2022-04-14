@@ -7,29 +7,13 @@ body {
   font-family: Calibri, sans-serif;
 }
 
-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  vertical-align: middle;
+.show {
+  max-height: 1000px !important;
 }
 
 a {
   text-decoration: none;
   color: whitesmoke;
-}
-
-header {
-  grid-area: he;
-  background-color: #29363d;
-  position: sticky;
-  top: 0;
-  padding: 1rem 0;
-  left: 0;
-  width: 100%;
-  display: flex;
-  z-index: 10;
 }
 
 /*logga*/
