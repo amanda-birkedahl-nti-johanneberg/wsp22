@@ -104,6 +104,7 @@ end
 # Visa en annan användares konto, om admin är inloggad
 #
 get '/konto/:id' do |id|
+  return redirect '/konto' unless auth? && admin?(session[:user])
   @user = get_user(id.to_i)
   @bokningar = get_bookings(id.to_i)
   slim :"konto/visa", locals: { is_me: id.to_i == session[:user][:id] }
@@ -114,14 +115,24 @@ end
 # @param [String] pass, lösenord
 # @param [String] namn, användarnamn
 post '/konto' do
-  # TODO: verifiera kredentialer
   password = params[:pass]
   namn = params[:namn]
+
+  result = verify_creds(namn, password)
+
+  unless result[:error].nil?
+    session[:error_msg] = "Du måste ange användarnamn och lösenord"
+    return redirect '/konto'
+  end
+
   hash = get_user_hash(namn)
 
   matchar = BCrypt::Password.new(hash) == password
-  logga_in(namn) if matchar
-
+  if matchar
+    logga_in(namn)
+  else 
+    session[:error_msg] = "Användarnamnet eller lösenordet är fel"
+  end
   redirect '/konto'
 end
 
@@ -130,11 +141,25 @@ end
 # @param [String] pass, lösenord
 # @param [String] namn, användarnamn
 post '/konto/skapa' do
-  # TODO: verifiera kredentialer
   password = params[:pass]
   namn = params[:namn]
+
+  result = verify_creds(namn, password)
+  exists = user_exists(namn)
+
+  unless exists
+    session[:error_msg] = "Användaren existerar redan"
+    return redirect '/konto'
+  end
+
+  unless result[:error].nil?
+    session[:error_msg] = "Du måste ange användarnamn och lösenord"
+    return redirect '/konto'
+  end
+  
   hash = BCrypt::Password.create(password)
-  skapa_konto(namn, hash)
+  
+  result = skapa_konto(namn, hash)
 
   logga_in(namn)
 
@@ -150,7 +175,7 @@ end
 # Ändrar status på en bokning till 'Avbruten', om användaren kan avbryta
 #
 post '/bokning/:id/avbryt' do |id|
-  redirect '/konto' unless user_can_cancel(id.to_i, session[:user][:id])
+  return redirect '/konto' unless user_can_cancel(id.to_i, session[:user][:id])
 
   cancel_booking(id.to_i)
   redirect('/konto')
@@ -159,8 +184,8 @@ end
 # Låter en admin slutflöra en bokning om den är klar
 #
 post '/bokning/:id/slutfor' do |id|
-  redirect '/konto' unless auth?
-  redirect '/konto' unless admin?(session[:user])
+  return redirect '/konto' unless auth?
+  return redirect '/konto' unless admin?(session[:user])
 
   slutfor_booking(id.to_i)
   redirect('/admin')
@@ -174,8 +199,8 @@ end
 post '/bokning/:id/betyg' do |id|
   bokning_id = id.to_i
 
-  redirect '/konto' unless auth?
-  redirect '/konto' unless user_can_rate(bokning_id, session[:user])
+  return redirect '/konto' unless auth?
+  return redirect '/konto' unless user_can_rate(bokning_id, session[:user])
 
   text = params[:text]
   betyg = params[:rating].to_i
@@ -186,7 +211,7 @@ end
 
 # Visar adminsidan om admin är inloggad
 get '/admin' do
-  redirect '/konto' unless auth? && admin?
+  return redirect '/konto' unless auth? && admin?
 
   status = params[:status].nil? ? nil : params[:status].to_i
 
