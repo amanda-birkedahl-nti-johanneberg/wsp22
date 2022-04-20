@@ -28,7 +28,7 @@ end
 get '/boende' do
   @boende = get_rooms # Hämta alla boende från databas
 
-  slim :"boende/index"
+  slim(:"boende/index")
 end
 
 # Visar sidan för att redigera rum
@@ -37,9 +37,11 @@ end
 get '/boende/:id/redigera' do |id|
   rum = get_room(id)
 
+  p rum
+
   # Omvandla 'rgb(rr,gg,bb)' till hex-kod för chrome gör all hex till rbg >:(
   @color_as_hex = rbg_to_hex(rum[:bakgrund])
-  slim :"boende/redigera", locals: { rum: rum }
+  slim(:"boende/redigera", locals: { rum: rum })
 end
 
 # Uppdaterar ett rum och omdirigerar till '/boende'
@@ -49,6 +51,9 @@ end
 #
 # @see Model#create_article
 post '/boende/:id/redigera' do |id|
+  # #force_encoding("UTF-8") tvingar tecken som åäö till utf, annars blir
+  # de ACII-8BIT vilket ger ett fel
+  # @see https://stackoverflow.com/q/30494001
   nytt_rum = JSON.parse(request.body.read)
   uppdatera_rum(id.to_i, nytt_rum)
 
@@ -83,7 +88,7 @@ end
 
 # Visar after-ski sidan
 #
-get '/after_ski' do
+get '/after-ski' do
   slim :"statiska/after_ski"
 end
 
@@ -97,17 +102,34 @@ get '/konto' do
   slim :"konto/visa", locals: { is_me: true }
 end
 
-before '/konto/:id' do
-  redirect '/konto' unless admin?(session[:user])
+# Loggar ut
+get '/konto/signout' do
+  session&.destroy
+  redirect '/'
 end
 
 # Visa en annan användares konto, om admin är inloggad
 #
 get '/konto/:id' do |id|
   return redirect '/konto' unless auth? && admin?(session[:user])
+
   @user = get_user(id.to_i)
   @bokningar = get_bookings(id.to_i)
   slim :"konto/visa", locals: { is_me: id.to_i == session[:user][:id] }
+end
+
+before '/konto' do
+  next unless request.post?
+
+  password = params[:pass]
+  namn = params[:namn]
+
+  result = verify_creds(namn, password)
+
+  unless result[:error].nil?
+    session[:signin_error_msg] = 'Du måste ange användarnamn och lösenord'
+    return redirect '/konto'
+  end
 end
 
 # Loggar in om lösenord och användarman stämmer
@@ -115,25 +137,38 @@ end
 # @param [String] pass, lösenord
 # @param [String] namn, användarnamn
 post '/konto' do
+  session[:signin_error_msg] = nil
+
   password = params[:pass]
   namn = params[:namn]
-
-  result = verify_creds(namn, password)
-
-  unless result[:error].nil?
-    session[:error_msg] = "Du måste ange användarnamn och lösenord"
-    return redirect '/konto'
-  end
 
   hash = get_user_hash(namn)
 
   matchar = BCrypt::Password.new(hash) == password
   if matchar
     logga_in(namn)
-  else 
-    session[:error_msg] = "Användarnamnet eller lösenordet är fel"
+  else
+    session[:signin_error_msg] = 'Användarnamnet eller lösenordet är fel'
   end
   redirect '/konto'
+end
+
+before '/konto/skapa' do
+  password = params[:pass]
+  namn = params[:namn]
+
+  result = verify_creds(namn, password)
+  exists = user_exists?(namn)
+
+  unless exists
+    session[:signup_error_msg] = 'Användaren existerar redan'
+    return redirect '/konto'
+  end
+
+  unless result[:error].nil?
+    session[:signup_error_msg] = 'Du måste ange användarnamn och lösenord'
+    return redirect '/konto'
+  end
 end
 
 # Skapar konto och loggar in om användaren skapas
@@ -141,35 +176,17 @@ end
 # @param [String] pass, lösenord
 # @param [String] namn, användarnamn
 post '/konto/skapa' do
+  session[:signup_error_msg] = nil
+
   password = params[:pass]
   namn = params[:namn]
 
-  result = verify_creds(namn, password)
-  exists = user_exists(namn)
-
-  unless exists
-    session[:error_msg] = "Användaren existerar redan"
-    return redirect '/konto'
-  end
-
-  unless result[:error].nil?
-    session[:error_msg] = "Du måste ange användarnamn och lösenord"
-    return redirect '/konto'
-  end
-  
   hash = BCrypt::Password.create(password)
-  
-  result = skapa_konto(namn, hash)
 
+  skapa_konto(namn, hash)
   logga_in(namn)
 
   redirect '/konto'
-end
-
-# Loggar ut
-post '/konto/signout' do
-  session&.destroy
-  redirect '/'
 end
 
 # Ändrar status på en bokning till 'Avbruten', om användaren kan avbryta
@@ -211,7 +228,7 @@ end
 
 # Visar adminsidan om admin är inloggad
 get '/admin' do
-  return redirect '/konto' unless auth? && admin?
+  return redirect '/konto' unless auth? && admin?(session[:user])
 
   status = params[:status].nil? ? nil : params[:status].to_i
 

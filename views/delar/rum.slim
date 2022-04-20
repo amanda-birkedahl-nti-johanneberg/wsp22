@@ -2,20 +2,20 @@ article.rum style="background-color: #{rum[:bakgrund]}"
     img[src=rum[:bild] alt="Bild på litet hotellrum"]
     .rum_text
         div
-            h3 #{room_type(rum[:typ])} - #{rum[:ppn]} kr/natt
+            h3 class="text-xl font-bold" #{room_type(rum[:typ])} - #{rum[:ppn]} kr/natt
             - if session[:user] && session[:user][:admin] == 1
                 a.edit href="/boende/#{rum[:id]}/redigera"      
                     span class="material-icons" edit
-        p = rum[:beskrivning]
-        ul
+        p = rum[:beskrivning].force_encoding('utf-8')
+        ul class="list-disc"
             - rum[:punkter].each do |punkt|
                 li = punkt
-        form.book-form method="post" action="/boende/#{rum[:id]}/boka"
+        form.book-form method="post" action="/boende/#{rum[:id]}/boka" class="bg-white p-4 rounded-md shadow-md"
             h3 Boka rummet
             label for="guests-#{rum[:id]}" Antal gäster
-            input id="guests-#{rum[:id]}" type="number" name="guests"/
+            input id="guests-#{rum[:id]}" type="number" name="guests" class="appearance-none border border-gray-300"
             label for="nights-#{rum[:id]}" Antal nätter
-            input id="nights-#{rum[:id]}" type="number" name="nights"/
+            input id="nights-#{rum[:id]}" type="number" name="nights" class="appearance-none border border-gray-300"
             label for="rooms-#{rum[:id]}" Antal rum
-            input id="rooms-#{rum[:id]}" type="number" name="rooms"/
-            input type="submit" value="Boka rum"/
+            input id="rooms-#{rum[:id]}" type="number" name="rooms" class="appearance-none border border-gray-300"
+            input type="submit" class="appearance-none bg-white rounded-sm my-2 border border-gray-300 shadow-sm" value="Boka rum"/

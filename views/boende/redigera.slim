@@ -1,7 +1,7 @@
 form#redigera
     section#edit-room
         section#bilddel
-            img#bild[src=rum[:bild] alt="#{rum[:alt]}"]
+            img#bild[src=rum[:bild] alt="#{rum[:bild_alt].force_encoding('utf-8')}"]
             section.action
                 section
                     input#bild-value type="text" placeholder="https://www.url.com/img.png" value="#{rum[:bild]}"
@@ -13,7 +13,7 @@ form#redigera
                 option value=2 Large
                 option value=3 Svit
 
-            textarea#beskrivning name="beskrivning" rows="4" resizable="off" = rum[:beskrivning]
+            textarea#beskrivning name="beskrivning" rows="4" resizable="off" = rum[:beskrivning].force_encoding('utf-8')
             ul.align-left#list
                 span#add-list class="material-icons" add
 

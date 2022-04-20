@@ -3,13 +3,11 @@ require 'json'
 
 # alla hjälpfunktioner
 module Models
-
-
   # Databaskopplingen
   #
   # @return [Extralite::Database]
   def db
-    Extralite::Database.new './db/hotell.db'
+    @db ||= Extralite::Database.new './db/hotell.db'
   end
 
   # Hämtar alla rum
@@ -50,11 +48,11 @@ module Models
   # @option rum [Integer] ppn pris per natt
   #
   def uppdatera_rum(id, rum)
-    rum['punkter'] = JSON.generate(rum['punkter'])
+    rum['punkter'] = JSON.generate(rum['punkter']).force_encoding('utf-8')
     stmt = db.prepare('update rum set typ = ?, bild = ?, bild_alt = ?, beskrivning = ?, bakgrund = ?, punkter = ?, antal = ?, ppn = ? where id = ?')
 
     stmt.query(rum['typ'],
-              rum['bild'], rum['bild_alt'], rum['beskrivning'], rum['bakgrund'], rum['punkter'], rum['antal'], rum['ppn'], id)
+               rum['bild'], rum['bild_alt'], rum['beskrivning'], rum['bakgrund'], rum['punkter'], rum['antal'], rum['ppn'], id)
   end
 
   # Bokar ett rum åt en användare
@@ -71,7 +69,7 @@ module Models
     rum = params[:rooms]
 
     db.query('insert into bokningar (user_id, antal_personer, rum_id, antal_rum, antal_nights) values($1,$2,$3,$4,$5)',
-            user_id, gaster, rum_id, rum, natter)
+             user_id, gaster, rum_id, rum, natter)
   end
 
   # Hämtar bokningar för en viss användare och/eller typ
@@ -185,6 +183,24 @@ module Models
   # @option user [String] namn
   def get_user(id)
     db.query_single_row('select namn, admin, id from users where id = $1', id)
+  end
+
+  # verifierar namn och lösenord
+  #
+  # @param [String] namn
+  # @param [String] pass
+  # @return [Hash] result
+  # @option result [Boolean?] error
+  def verify_creds(namn, pass)
+    return { error: true } if namn.nil? || namn == ''
+    return { error: true } if pass.nil? || pass == ''
+
+    { error: nil }
+  end
+
+  def user_exists?(name)
+    count = db.query_single_value('select count(id) from users where namn = ?', name)
+    count.zero?
   end
 
   # bestämmer om inloggad användare finns

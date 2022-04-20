@@ -9,12 +9,12 @@ html[lang="en"]
     link[rel="stylesheet" href="/css/style2.css"]
     link[rel="stylesheet" href="/css/tailwind-dist.css"]
     link[href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"]
-  body class="bg-primary-dark"
+  body class="grid grid-rows-[100px_auto_1fr] grid-cols-1 bg-primary-dark"
     == slim :"delar/header"
     
-    main class="bg-white py-4"
+    main class="bg-white flex-grow row-start-2 row-end-3 col-start-1 "
       == yield
-    footer
+    footer class="bg-primary-dark row-start-3 row-end-4 col-start-1"
         section#info_footer
         article#kontakt
             .text_footer
