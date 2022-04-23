@@ -1,30 +1,52 @@
 const punktChangeHandler = (index) => (event) => {
   data.punkter[index] = event.currentTarget.value;
 };
-console.log(bakgrund);
+
+const removePunktHandler = (index) => () => {
+  const punkter = data.punkter.filter((p) => data.punkter.indexOf(p) !== index);
+  data.punkter = punkter;
+  skapaPunktList(punkter);
+  console.log("remove");
+};
+
 const skapaPunkt = (punkt, index) => {
+  const li = document.createElement("li");
   const element = document.createElement("div");
-  const knapp = document.createElement("span");
+
+  element.className = "flex items-center gap-2";
+
+  const knapp = document.createElement("div");
   const p = document.createElement("input");
   p.value = punkt;
   p.onchange = punktChangeHandler(index);
-  knapp.className = "material-icons";
+
+  knapp.className = "material-icons bg-white select-none cursor-pointer";
   knapp.innerText = "remove";
+
+  knapp.onclick = removePunktHandler(index);
 
   element.appendChild(p);
   element.appendChild(knapp);
 
-  return element;
+  li.appendChild(element);
+
+  return li;
 };
+const punktlista = document.getElementById("list");
 
 /*
  * Skapa punkterna som finns när sidan laddas
  */
-const punktlista = document.getElementById("list");
-data.punkter.forEach((punkt, index) => {
-  const p = skapaPunkt(punkt, index);
-  punktlista.append(p);
-});
+const skapaPunktList = (punkter) => {
+  // återställ listan
+  punktlista.innerHTML = "";
+  punkter.forEach((punkt, index) => {
+    const p = skapaPunkt(punkt, index);
+    punktlista.append(p);
+  });
+};
+
+skapaPunktList(data.punkter);
 
 /*
  * Lyssna på när användaren skapar nya punkter
@@ -52,18 +74,20 @@ document.getElementById("reset").onclick = (e) => {
 /*
  * Hantera bilden
  */
-document.getElementById("valj-bild").onclick = () => {
+document.getElementById("valj-bild").onclick = (event) => {
+  event.preventDefault()
+
   const url = document.getElementById("bild-value").value;
   document.getElementById("bild").src = url;
+  data.bild = url
 };
-
-const resultat = document.getElementById("resultat");
-resultat.innerText = JSON.stringify(data);
+console.log("form");
 
 /*
  * skicka iväg datan
  */
-document.getElementById("redigera").onsubmit = async (e) => {
+const form = document.getElementById("redigera");
+form.onsubmit = async (e) => {
   e.preventDefault();
 
   data.bakgrund = huvuddel.style.backgroundColor;

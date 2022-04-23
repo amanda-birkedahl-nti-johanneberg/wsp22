@@ -96,9 +96,6 @@ footer {
   color: whitesmoke;
 }
 
-.show {
-  top: 0;
-}
 
 #menua {
   font-size: 25px;
@@ -178,19 +175,19 @@ footer {
 #ar {
   grid-area: ar;
   margin: 20px;
-  max-height: 50vh;
+  max-height: 320px;
 }
 
 #ab {
   grid-area: ab;
   margin: 20px;
-  max-height: 50vh;
+  max-height: 320px;
 }
 
 #as {
   grid-area: as;
   margin: 20px;
-  max-height: 50vh;
+  max-height: 320px;
 }
 
 #oppettider .tider {

@@ -1,21 +1,23 @@
 article.rum style="background-color: #{rum[:bakgrund]}"
     img[src=rum[:bild] alt="Bild på litet hotellrum"]
     .rum_text
+        - betyg = get_total_ratings(rum[:id])
+        - unless betyg.nil?
+            section 
+                div class="stars flex-shrink" style="--s:25px"  value="#{betyg}"
+                    input type="radio"  value="1" disabled=true 
+                    input type="radio"  value="2" disabled=true
+                    input type="radio"  value="3" disabled=true
+                    input type="radio"  value="4" disabled=true
+                    input type="radio"  value="5" disabled=true
+                    i style="--p:#{betyg}"
         div
             h3 class="text-xl font-bold" #{room_type(rum[:typ])} - #{rum[:ppn]} kr/natt
-            - if session[:user] && session[:user][:admin] == 1
+            - if admin?
                 a.edit href="/boende/#{rum[:id]}/redigera"      
                     span class="material-icons" edit
         p = rum[:beskrivning].force_encoding('utf-8')
-        ul class="list-disc"
+        ul class="list-disc flex-1"
             - rum[:punkter].each do |punkt|
                 li = punkt
-        form.book-form method="post" action="/boende/#{rum[:id]}/boka" class="bg-white p-4 rounded-md shadow-md"
-            h3 Boka rummet
-            label for="guests-#{rum[:id]}" Antal gäster
-            input id="guests-#{rum[:id]}" type="number" name="guests" class="appearance-none border border-gray-300"
-            label for="nights-#{rum[:id]}" Antal nätter
-            input id="nights-#{rum[:id]}" type="number" name="nights" class="appearance-none border border-gray-300"
-            label for="rooms-#{rum[:id]}" Antal rum
-            input id="rooms-#{rum[:id]}" type="number" name="rooms" class="appearance-none border border-gray-300"
-            input type="submit" class="appearance-none bg-white rounded-sm my-2 border border-gray-300 shadow-sm" value="Boka rum"/
+        a href="/boende/#{rum[:id]}" class="bg-white px-4 py-2 rounded-sm shadow-md" Visa detaljer

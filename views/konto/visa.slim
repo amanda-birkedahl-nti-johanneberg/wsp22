@@ -1,15 +1,18 @@
-section class="container-md"
+section class="container-md p-8"
+    - if is_me && admin?
+        <a href="/admin" class="text-blue-400 font-semibold underline inline-block">Gå till adminpanel</a>
     section class="flex gap-4"
+
         - if is_me
-            h1 class="font-normal text-2xl mb-4" Hej <span class="font-bold">#{@user[:namn]}</span>
+            h1 class="font-normal text-2xl mb-4" Hej <span class="font-bold">#{@user[:namn].force_encoding("utf-8")}</span>
         - else 
-            h1 class="font-normal text-2xl mb-4" Visar <span class="font-bold">#{@user[:namn]}</span>
+            h1 class="font-normal text-2xl mb-4" Visar <span class="font-bold">#{@user[:namn].force_encoding("utf-8")}</span>
         - if is_me
             form action="/konto/signout" method="get" class=""
-                input type="submit" value="Logga ut" class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" 
-
-    - if is_me && admin?(session[:user])
-        <a href="/admin" class="text-blue-400 font-semibold underline inline-block">Gå till adminpanel</a>
+                input type="submit" value="Logga ut" class="cursor-pointer flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded" 
+        - if is_me || admin? && !admin?(@user)
+            form action="/konto/#{@user[:id]}/radera" method="post" 
+                button class="bg-red-600 px-4 py-2 rounded-md text-white font-semibold" type="submit" Radera användare
 
     section class="my-4"
         - if is_me
@@ -24,6 +27,7 @@ section class="container-md"
                     h3 <span class="font-bold">#{boknings_status(bokning[:status])}</span>: #{room_type(bokning[:typ])} i #{bokning[:antal_nights]} nätter
                     p Antal rum: #{bokning[:antal_rum]}
                     p Total pris per natt: #{bokning[:ppn] * bokning[:antal_rum]} kr
+                    p Från #{bokning[:start_datum]} - #{bokning[:slut_datum]}
                 section class="flex flex-col"
                     - if bokning[:status] == 0
                         h2 class="text-xl mb-2" Åtgärder
@@ -42,15 +46,14 @@ section class="container-md"
                                 i
                             input type="submit" value="Lämna betyg" class="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
                     - if bokning[:status] == 4
-                        - betyg = get_rating(bokning[:bokning_id])
-                        h2 class="text-xl mb-2" Omdöme
+                        - betyg = get_rating(bokning[:bokning_id], @user[:id])
+                        h2 class="text-xl mb-2" Ditt omdöme
                         section
-                            p #{betyg[:text]}
                             div class="stars flex-shrink" style="--s:25px"  value="#{betyg[:betyg]}"
-                                input type="radio"  value="1" disabled=true
+                                input type="radio"  value="1" disabled=true 
                                 input type="radio"  value="2" disabled=true
                                 input type="radio"  value="3" disabled=true
                                 input type="radio"  value="4" disabled=true
                                 input type="radio"  value="5" disabled=true
-                                i
-                            p = betyg[:betyg]
+                                i style="--p:#{betyg[:betyg]}"
+                            p #{betyg[:text].force_encoding("utf-8")}

@@ -32,6 +32,10 @@ section#boende_sida
                     option[value="Svit"]
                         | Svit
             input#sok[type="submit" value="Sök"]
+    - if auth? && admin?(session[:user])
+        form action="boende" method="post" class="flex items-center justify-center p-4 pt-0"
+            input type="submit" value="Skapa nytt rum" class="bg-white px-4 py-2 cursor-pointer"
+            
     section#section2_bo
         - @boende.each do |rum|
             == slim :"delar/rum", locals: { rum: rum }

@@ -7,7 +7,9 @@ module Models
   #
   # @return [Extralite::Database]
   def db
-    @db ||= Extralite::Database.new './db/hotell.db'
+    db = Extralite::Database.new './db/hotell.db'
+    db.query('PRAGMA foreign_keys = true')
+    db
   end
 
   # Hämtar alla rum
@@ -32,6 +34,21 @@ module Models
 
     rad[:punkter] = JSON.parse(rad[:punkter])
     rad
+  end
+
+  # Skapar ett rum
+  #
+  # @return [Integer] id Rummets id
+  def skapa_rum
+    db.query('insert into rum (typ) values (0)')
+    db.last_insert_rowid
+  end
+
+  # Raderar ett rum
+  #
+  # @param [Integer] id
+  def delete_room(id)
+    db.query('delete from rum where id = ?', id)
   end
 
   # Uppdaterar ett rum med dess id och json
@@ -65,10 +82,10 @@ module Models
   # @option params [Integer] rooms
   def boka_rum(rum_id, user_id, params)
     gaster = params[:guests]
-    natter = params[:nights]
+    natter = params[:nights].to_i
     rum = params[:rooms]
 
-    db.query('insert into bokningar (user_id, antal_personer, rum_id, antal_rum, antal_nights) values($1,$2,$3,$4,$5)',
+    db.query("insert into bokningar (user_id, antal_personer, rum_id, antal_rum, antal_nights, start_datum, slut_datum) values($1,$2,$3,$4,$5, DATE('now'), DATE('now', '+#{natter} days') )",
              user_id, gaster, rum_id, rum, natter)
   end
 
@@ -86,6 +103,21 @@ module Models
               left join users u on b.user_id = u.id
               #{user_id.nil? ? '' : 'where user_id = :id'}
               #{typ.nil? ? '' : 'where status = :typ'}", id: user_id, typ: typ)
+  end
+
+  # Hämtar en bokning
+  #
+  # @param [Integer] booking_id
+  # @return [Hash]
+  def get_booking(booking_id)
+    db.query_single_row("select r.typ, r.ppn, rum_id, antal_rum, antal_nights, antal_personer,
+      start_datum, slut_datum, status, bokning_id,
+      u.namn as user_namn, u.id as user_id, r.bild as rum_bild
+
+      from bokningar b
+      left join rum r on b.rum_id = r.id
+      left join users u on b.user_id = u.id
+      where bokning_id = ?", booking_id)
   end
 
   # Bestämmer om en användare kan avboka ett rum
@@ -125,13 +157,16 @@ module Models
 
   # Betygsätter ett rum
   #
-  # @param [Integer] room boknings_id
+  # @param [Integer] room_id
+  # @param [Integer] bokning_id
   # @param [Integer] user
   # @param [String] text
   # @param [String] betyg
-  def rate_room(room, user, text, betyg)
-    db.query('insert into betyg (bokning_id, user_id, text, betyg) values(?, ?, ?, ?)', room, user, text, betyg)
-    db.query('update bokningar set status = 4 where bokning_id = ?', room)
+  def rate_room(room_id, bokning_id, user, text, betyg)
+    p [room_id, bokning_id, user, text, betyg]
+    db.query('insert into betyg (rum_id, bokning_id, user_id, text, betyg) values(?, ?, ?, ?, ?)', room_id, bokning_id,
+             user, text, betyg)
+    db.query('update bokningar set status = 4 where bokning_id = ?', bokning_id)
   end
 
   # Hämtar en recension
@@ -141,10 +176,30 @@ module Models
   # @return [Hash] betyg
   # @option betyg [String] text
   # @option betyg [String] betyg
-  def get_rating(bokning_id)
-    user = session[:user][:id]
+  def get_rating(bokning_id, user_id = session[:user][:id])
+    db.query_single_row(
+      'select b.text, b.betyg, u.namn from betyg b left join users u on b.user_id = u.id where user_id = ? and bokning_id = ?', user_id, bokning_id
+    )
+  end
 
-    db.query_single_row('select text, b.betyg from betyg b where user_id = ? and bokning_id = ?', user, bokning_id)
+  # Hämtar alla betyg för ett rum
+  #
+  # @param [Integer] rum_id rummets id
+  # @return [Array<Hash>]
+  def get_ratings(rum_id)
+    db.query('select b.text, b.betyg, u.namn from betyg b left join users u on b.user_id = u.id where rum_id = ?',
+             rum_id)
+  end
+
+  # Hämtar genomsnittet av alla betyg för ett rum
+  #
+  # @param [Integer] rum_id
+  # @return [Integer] genomsnitt
+  def get_total_ratings(rum_id)
+    betyg = get_ratings(rum_id)
+    return nil if betyg.nil? || betyg.length.zero?
+
+    betyg.reduce(0) { |summa, b| summa.to_i + b[:betyg].to_i } / betyg.length
   end
 
   # Hämtar en användares lösenord-hash
@@ -174,6 +229,14 @@ module Models
     session[:user] = user
   end
 
+  # raderar en användare
+  #
+  # @param [Integer] id användarens id
+  def delete_user(id)
+    # ta bort själva användaren
+    db.query('delete from users where id = ?', id)
+  end
+
   # hämtar en användare
   #
   # @param [Integer] id
@@ -192,6 +255,7 @@ module Models
   # @return [Hash] result
   # @option result [Boolean?] error
   def verify_creds(namn, pass)
+    p [namn, pass]
     return { error: true } if namn.nil? || namn == ''
     return { error: true } if pass.nil? || pass == ''
 
@@ -200,7 +264,7 @@ module Models
 
   def user_exists?(name)
     count = db.query_single_value('select count(id) from users where namn = ?', name)
-    count.zero?
+    count.positive?
   end
 
   # bestämmer om inloggad användare finns
@@ -215,7 +279,7 @@ module Models
   # @param [Hash] user
   # @option user [Integer] id
   # @return [Boolean]
-  def admin?(user)
+  def admin?(user = session[:user])
     return false if user.nil?
 
     db.query_single_value('select admin from users where id = ?', user[:id]) == 1

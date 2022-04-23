@@ -14,18 +14,20 @@ form#redigera
                 option value=3 Svit
 
             textarea#beskrivning name="beskrivning" rows="4" resizable="off" = rum[:beskrivning].force_encoding('utf-8')
-            ul.align-left#list
-                span#add-list class="material-icons" add
+            div#add-list class="self-start flex items-center bg-white mt-4 mb-2 p-2 rounded-sm cursor-pointer select-none"
+                p Lägg till ny rad
+                span class="material-icons" add
+            ul.align-left.space-y-2#list
 
-            section.action
-                section
+            section.action 
+                section class="bg-white p-4 m-auto mb-2 rounded-sm flex items-center gap-2"
                     input#valj-farg type="color" value="#{{@color_as_hex}}"
-                    button#reset Återställ
+                    button#reset class="bg-gray-100 px-4 py-2" Återställ
 
-    section#spara-rum
-        input type="submit" value="spara"
-
-    p#resultat
+    section#spara-rum class="bg-primary-light flex p-8 justify-center"
+        input type="submit" value="Spara rum" class="appearance-none bg-white p-2 shadow-md rounded-md cursor-pointer"
+form#spara-rum class="bg-primary-light flex px-8 pb-8 justify-center" method="post" action="/boende/#{rum[:id]}/radera"
+    input type="submit" value="Radera rum" class="appearance-none bg-red-700 text-white font-semibold p-2 shadow-md rounded-md cursor-pointer"
 javascript:
     const data = #{{rum.to_json}}
     const bakgrund = "#{@color_as_hex}"
