@@ -187,9 +187,19 @@ before '/konto' do
     session[:signin_error_msg] = 'Du måste ange användarnamn och lösenord'
     return redirect '/konto'
   end
+
+  # förhindra spam, tillåt endast 5 misslyckade försök, sedan lås ute datorn i 5 minuter
+  session[:attempts] = 0 if Time.new.to_i - session[:last_attempt].to_i > 300
+  if session[:attempts] > 5
+    session[:signin_error] = 'För många försök. Försök igen senare.'
+    return redirect '/sign-in'
+  end
+
   p user_exists?(namn)
   unless user_exists?(namn)
     session[:signin_error_msg] = 'Användarnamn eller lösenord är fel'
+    session[:last_attempt] = Time.new
+    session[:attempts] += 1
     return redirect '/konto'
   end
 end
@@ -208,8 +218,12 @@ post '/konto' do
 
   matchar = BCrypt::Password.new(hash) == password
   if matchar
+    session[:attempts] = 0
+    session[:signin_error] = ''
     logga_in(namn)
   else
+    session[:attempts] += 1
+    session[:last_attempt] = Time.new
     session[:signin_error_msg] = 'Användarnamnet eller lösenordet är fel'
   end
   redirect '/konto'
