@@ -6,6 +6,7 @@ section class="container-md"
         a.link href="/admin?status=1" Pågående 
         a.link href="/admin?status=3" Avbruta 
         a.link href="/admin?status=2" Slutförda
+        a.link href="/admin?status=4" Betygsatta
     section class="flex flex-col gap-4"
         - @bokningar.each do |bokning|
             article class="shadow-md p-2 rounded-md flex  gap-8"
@@ -35,3 +36,4 @@ section class="container-md"
                         h3 Bokat av borttagen användare
                     - else
                         h3 Bokat av <a class="text-blue-400 underline font-semibold" href="/konto/#{bokning[:user_id]}">#{bokning[:user_namn]}</a>
+                    p Från #{bokning[:start_datum]} - #{bokning[:slut_datum]}
